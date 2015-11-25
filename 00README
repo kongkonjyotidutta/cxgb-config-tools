@@ -1,0 +1,59 @@
+
+This is a test repository for XRS developers.
+
+DO WHATEVER YOU LIKE!
+
+
+The master GIT repository is
+
+	git@hvtswgit.xy01.xyratex.com:XRS/testing.git
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The directory structure is as follows:
+
+
+	bin/		Programs and scripts used for software development.
+			*NOT* included in the (S)RPM.
+
+	   jenkins-build
+			Optional Jenkins build script. If present, it is run
+			_instead_ of the system default.
+
+	   jenkins-pre-build.sh
+			Optional Jenkins pre-rpmbuild script. If present, 
+			it is run just before the rpmbuild command.
+
+	   jenkins-post-build.sh
+			Optional Jenkins post-rpmbuild script. If present, 
+			it is run straight after the rpmbuild command.
+
+
+	doc/		Any internal documentation for the developers.
+			*NOT* included in the (S)RPM.
+
+
+	etc/		Any configuration files.
+
+	   jenkins-emu.conf
+			Config file for Jenkins emulation shell.
+
+
+	rpm/		RPM related files
+
+			The content of this directory is copied into SOURCES/
+			before creating the SRPM.
+  
+	   package.spec.in
+			RPM package configuration file. This file is renamed 
+			to the real package name by Jenkins.
+
+
+	src/		The source code
+
+			Everything that is needed to (re)build the package. 
+			This directory is packed into a tarball, and 
+			included in the SRPM as Source0.
+

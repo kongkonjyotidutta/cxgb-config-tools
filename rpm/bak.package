@@ -1,0 +1,90 @@
+Name:      testing
+Version:   1.0
+#Release:   1.%RPM_RELTAG%
+Release:   1
+Summary:   Chelsio Unified Wire Install Config package for XRS
+Group:     System Environment/Base
+Vendor:    Xyratex
+License:   GPL
+Provides:  headache = 1.2.3
+Source:	   %RPM_SOURCE%
+BuildRequires: gnupg2
+requires:  cxgb4 > 1.1.0.10, chelsio-series4-firmware > 1.1.0.10
+
+%{!?kversion:%define kversion %(uname -r)}
+%{!?rhelkerver:%define rhel-kerver "2.6.32-431.el6.x86_64"}
+
+
+%description
+This package contains the post install config scripts required to setup the 
+Chelsio Unified Wire RHEL6u5 rpms.
+
+%prep
+%setup -n src
+echo "RHEL kernel ver: %{rhelkerver}"
+echo "XRS kernerl version: %{kversion}"
+
+%build
+
+make 
+#echo -e "override cxgb4i * weak-updates" > cxgb4i.conf
+
+
+%install
+# Setup the dirs
+install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/
+install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/drivers/
+install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/drivers/net/
+install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/drivers/net/cxgb4/
+
+
+install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/kernel/
+install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/kernel/drivers/
+install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/kernel/drivers/scsi/
+install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/kernel/drivers/scsi/cxgbi/
+
+install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/drivers/infiniband/
+install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/drivers/infiniband/hw//
+install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/drivers/infiniband/hw/iw_cxgb4/
+
+
+#install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/kernel/
+#install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/kernel/drivers/
+#install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/kernel/drivers/scsi/
+#install -m 755 -d ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/kernel/drivers/scsi/cxgbi/
+
+#cxgb4
+install -m 644 -D cxgb4.conf ${RPM_BUILD_ROOT}/etc/depmod.d/cxgb4.conf
+ln -sf /lib/modules/%{rhelkerver}/updates/drivers/net/cxgb4/cxgb4.ko ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/drivers/net/cxgb4/cxgb4.ko
+
+#cxgb4i
+install -m 644 -D cxgb4i.conf ${RPM_BUILD_ROOT}/etc/depmod.d/cxgb4i.conf
+ln -sf /lib/modules/%{rhelkerver}/updates/kernel/drivers/scsi/cxgbi/cxgb4i.ko ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/kernel/drivers/scsi/cxgbi/cxgb4i.ko
+
+#iw_cxgb4
+install -m 644 -D iw_cxgb4.conf ${RPM_BUILD_ROOT}/etc/depmod.d/iw_cxgb4.conf
+ln -sf /lib/modules/%{rhelkerver}/updates/drivers/infiniband/hw/iw_cxgb4/iw_cxgb4.ko ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/drivers/infiniband/hw/iw_cxgb4/iw_cxgb4.ko
+
+#libcxgbi
+install -m 644 -D cxgb4i.conf ${RPM_BUILD_ROOT}/etc/depmod.d/libcxgbi.conf
+ln -sf /lib/modules/%{rhelkerver}/updates/kernel/drivers/scsi/cxgbi/libcxgbi.ko ${RPM_BUILD_ROOT}/lib/modules/%{kversion}/weak-updates/kernel/drivers/scsi/cxgbi/libcxgbi.ko
+
+%files
+
+%defattr(-,root,root)
+
+/etc/depmod.d/cxgb4.conf
+/lib/modules/%{kversion}/weak-updates/drivers/net/cxgb4/cxgb4.ko
+
+/etc/depmod.d/cxgb4i.conf
+/lib/modules/%{kversion}/weak-updates/kernel/drivers/scsi/cxgbi/cxgb4i.ko
+
+/etc/depmod.d/iw_cxgb4.conf
+/lib/modules/%{kversion}/weak-updates/drivers/infiniband/hw/iw_cxgb4/iw_cxgb4.ko
+
+/etc/depmod.d/libcxgbi.conf
+/lib/modules/%{kversion}/weak-updates/kernel/drivers/scsi/cxgbi/libcxgbi.ko
+%clean
+
+rm -fr ${RPM_BUILD_ROOT}
+
